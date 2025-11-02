@@ -5,14 +5,13 @@ import {
   removeProduct,
   singleProduct,
 } from '../controllers/productController.js';
-import upload from '../middleware/multer.js';
-import adminAuth from '../middleware/adminAuth.js';
+import isAdmin from '../middleware/isAdmin.js';
 import uploadImage from '../middleware/multer.js';
 
 const productRouter = express.Router();
 
-productRouter.post('/add', uploadImage, addProduct);
-productRouter.post('/remove', adminAuth, removeProduct);
+productRouter.post('/add', uploadImage, isAdmin, addProduct);
+productRouter.post('/remove', isAdmin, removeProduct);
 productRouter.post('/single', singleProduct);
 productRouter.get('/list', listProducts);
 
