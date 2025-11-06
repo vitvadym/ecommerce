@@ -3,8 +3,8 @@ import ApiError from '../utils/apiError.js';
 
 const isAdmin = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
-    
+    const token = req.headers.authorization?.split(' ')[1];
+
     if (!token) {
       return next(new ApiError('Token not found', 401));
     }

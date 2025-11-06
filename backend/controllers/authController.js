@@ -4,8 +4,7 @@ import userModel from '../models/userModel.js';
 import createToken from '../utils/createTokten.js';
 import hashPassword from '../utils/hashPassword.js';
 import ApiError from '../utils/apiError.js';
-
-const isProduction = process.env.NODE_ENV === 'production';
+import verifyToken from '../utils/vefifyToken.js';
 
 const login = async (req, res, next) => {
   try {
@@ -25,18 +24,11 @@ const login = async (req, res, next) => {
 
     const payload = {
       id: user._id,
-      email: user.email,
     };
 
     const token = createToken(payload);
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
-    });
-
-    res.json({ success: true });
+    res.json({ success: true, token, user: user._id });
   } catch (error) {
     next(error);
   }
@@ -67,28 +59,29 @@ const register = async (req, res, next) => {
     });
 
     const user = await newUser.save();
-    const payload = { id: user._id, email: user.email };
+    const payload = { id: user._id };
     const token = createToken(payload);
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
-    });
-
-    res.json({ success: true });
+    res.json({ success: true, token, user: user._id });
   } catch (error) {
     next(error);
   }
 };
 
-const logout = async (req, res, next) => {
+const me = async (req, res, next) => {
   try {
-    res.clearCookie('token');
-    res.json({ success: true });
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = await verifyToken(token);
+
+    const user = await userModel.findById(decoded.id);
+    if (!user) {
+      return res.json({ success: true, user: null });
+    }
+
+    res.json({ success: true, user: decoded.id });
   } catch (error) {
     next(error);
   }
 };
 
-export { login, register, logout };
+export { login, register, me };

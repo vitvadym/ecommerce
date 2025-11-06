@@ -1,18 +1,15 @@
 import express from 'express';
-import {
-  listProducts,
-  addProduct,
-  removeProduct,
-  singleProduct,
-} from '../controllers/productController.js';
+import * as productController from '../controllers/productController.js';
 import isAdmin from '../middleware/isAdmin.js';
 import uploadImage from '../middleware/multer.js';
 
-const productRouter = express.Router();
+const router = express.Router();
 
-productRouter.post('/add', uploadImage, isAdmin, addProduct);
-productRouter.post('/remove', isAdmin, removeProduct);
-productRouter.post('/single', singleProduct);
-productRouter.get('/list', listProducts);
+router.post('/add', uploadImage, isAdmin, productController.addProduct);
+router.post('/remove', isAdmin, productController.removeProduct);
+router.get('/list', productController.listProducts);
+router.get('/latest', productController.latestProducts);
+router.get('/best-selling', productController.bestSellerProducts);
+router.get('/:id', productController.singleProduct);
 
-export default productRouter;
+export default router;

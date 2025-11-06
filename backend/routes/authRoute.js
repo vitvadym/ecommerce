@@ -7,9 +7,6 @@ const router = express.Router();
 
 router.post('/register', authController.register);
 router.post('/login', authController.login);
-router.post('/logout', isAuth, authController.logout);
-router.get('/protected', isAuth, isAdmin, (req, res) => {
-  res.json({ success: true, message: 'You are an admin', user: req.user });
-});
+router.get('/me',  authController.me);
 
 export default router;
