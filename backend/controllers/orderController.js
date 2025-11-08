@@ -26,8 +26,19 @@ const createOrder = async (req, res, next) => {
 
 const allOrders = async (req, res, next) => {
   try {
-    const orders = await orderModel.find({});
-    res.json({ success: true, orders });
+    const page = req.query.page || 1;
+    const limit = 7;
+    const skip = (page - 1) * limit;
+
+    const totalOrders = await orderModel.countDocuments({});
+    const totalPages = Math.ceil(totalOrders / limit);
+
+    const orders = await orderModel
+      .find({})
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+    res.json({ success: true, orders, totalPages });
   } catch (error) {
     next(error);
   }
@@ -44,15 +55,4 @@ const userOrders = async (req, res, next) => {
   }
 };
 
-const updateStatus = async (req, res, next) => {
-  try {
-    const { orderId, status } = req.body;
-
-    await orderModel.findByIdAndUpdate(orderId, { status });
-    res.json({ success: true, message: 'Status Updated' });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export { createOrder, allOrders, userOrders, updateStatus };
+export { createOrder, allOrders, userOrders };

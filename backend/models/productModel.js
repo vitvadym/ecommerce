@@ -10,7 +10,7 @@ const productSchema = new mongoose.Schema(
     subCategory: { type: String, required: true },
     sizes: { type: Array, required: true },
     bestseller: { type: Boolean },
-    rating: { type: Number, required: true, default: 0, max: 5 },
+    rating: { type: Number, required: true, max: 5, min: 0 },
   },
   {
     timestamps: true,

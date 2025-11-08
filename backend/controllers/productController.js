@@ -12,7 +12,6 @@ const addProduct = async (req, res) => {
       subCategory,
       sizes,
       bestseller,
-      rating,
     } = req.body;
 
     const files = req.files;
@@ -25,12 +24,13 @@ const addProduct = async (req, res) => {
       description,
       category,
       subCategory,
-      sizes,
-      images: urls,
+      sizes: JSON.parse(sizes),
       price: Number(price),
       bestseller: bestseller === 'true' ? true : false,
-      rating: Number(rating),
+      rating: Math.floor(Math.random() * 2) + 4,
     };
+
+    newProductItem.image = urls;
 
     const newProduct = new productModel(newProductItem);
     await newProduct.save();
@@ -71,7 +71,8 @@ const listProducts = async (req, res, next) => {
         ...filter,
       })
       .limit(perPage)
-      .skip(page ? (page - 1) * perPage : 0);
+      .skip(page ? (page - 1) * perPage : 0)
+      .sort({ createdAt: 'desc' });
 
     res.json({ success: true, products, totalPages });
   } catch (error) {
@@ -83,7 +84,7 @@ const latestProducts = async (req, res, next) => {
   try {
     const products = await productModel
       .find({})
-      .sort({ date: 'desc' })
+      .sort({ createdAt: 'desc' })
       .limit(10);
     res.json({ success: true, products });
   } catch (error) {
@@ -102,7 +103,13 @@ const bestSellerProducts = async (req, res, next) => {
 
 const removeProduct = async (req, res, next) => {
   try {
-    await productModel.findByIdAndDelete(req.body.id);
+    const { id: productId } = req.params;
+    const product = await productModel.findByIdAndDelete(productId);
+
+    if (!product) {
+      return next(new ApiError('Product not found', 404));
+    }
+
     res.json({ success: true, message: 'Product Removed' });
   } catch (error) {
     next(error);

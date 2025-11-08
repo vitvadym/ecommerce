@@ -24,11 +24,13 @@ const login = async (req, res, next) => {
 
     const payload = {
       id: user._id,
+      isAdmin: user.isAdmin,
+      email: user.email,
     };
 
     const token = createToken(payload);
 
-    res.json({ success: true, token, user: user._id });
+    res.json({ success: true, token, user: payload });
   } catch (error) {
     next(error);
   }
@@ -59,10 +61,15 @@ const register = async (req, res, next) => {
     });
 
     const user = await newUser.save();
-    const payload = { id: user._id };
+
+    const payload = {
+      id: user._id,
+      isAdmin: user.isAdmin,
+      email: user.email,
+    };
     const token = createToken(payload);
 
-    res.json({ success: true, token, user: user._id });
+    res.json({ success: true, token, user: payload });
   } catch (error) {
     next(error);
   }
@@ -73,12 +80,18 @@ const me = async (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
     const decoded = await verifyToken(token);
 
-    const user = await userModel.findById(decoded.id);
-    if (!user) {
+    const existUser = await userModel.findById(decoded.id);
+    if (!existUser) {
       return res.json({ success: true, user: null });
     }
 
-    res.json({ success: true, user: decoded.id });
+    const user = {
+      id: existUser._id,
+      isAdmin: existUser.isAdmin,
+      email: existUser.email,
+    };
+
+    res.json({ success: true, user });
   } catch (error) {
     next(error);
   }
