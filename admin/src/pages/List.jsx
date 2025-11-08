@@ -1,83 +1,54 @@
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import { backendUrl, currency } from '../App'
-import { toast } from 'react-toastify'
+import { useQuery } from '@tanstack/react-query';
+import productService from '../api/productService.js';
+import TableHead from '../components /TableHead.jsx';
+import TableProductRow from '../components /TableProductRow.jsx';
+import Spinner from '../components /Spinner.jsx';
+import Pagination from '../components /Pagination.jsx';
+import { useSearchParams } from 'react-router-dom';
 
-const List = ({ token }) => {
+const List = () => {
+  const [searchParams] = useSearchParams();
+  const params = searchParams.toString();
 
-  const [list, setList] = useState([])
+  const { data, isLoading } = useQuery({
+    queryFn: () => productService.getAllProducts(params),
+    queryKey: ['products', params],
+  });
 
-  const fetchList = async () => {
-    try {
+  const columns = ['Product', 'Category', 'Price', 'Action'];
 
-      const response = await axios.get(backendUrl + '/api/product/list')
-      if (response.data.success) {
-        setList(response.data.products.reverse());
-      }
-      else {
-        toast.error(response.data.message)
-      }
-
-    } catch (error) {
-      console.log(error)
-      toast.error(error.message)
-    }
-  }
-
-  const removeProduct = async (id) => {
-    try {
-
-      const response = await axios.post(backendUrl + '/api/product/remove', { id }, { headers: { token } })
-
-      if (response.data.success) {
-        toast.success(response.data.message)
-        await fetchList();
-      } else {
-        toast.error(response.data.message)
-      }
-
-    } catch (error) {
-      console.log(error)
-      toast.error(error.message)
-    }
-  }
-
-  useEffect(() => {
-    fetchList()
-  }, [])
+  const products = data?.data?.products ?? [];
 
   return (
     <>
-      <p className='mb-2'>All Products List</p>
-      <div className='flex flex-col gap-2'>
+      <div className='flex flex-col justify-between'>
+        <div className='w-full'>
+          <h2 className='pb-4 text-lg font-medium'>All Products</h2>
+          {isLoading && !data ? (
+            <Spinner />
+          ) : (
+            <>
+              <div className='mb-5 flex flex-col items-center max-w-5xl w-full overflow-hidden rounded-md bg-white border border-gray-500/20'>
+                <table className='md:table-auto table-fixed w-full overflow-hidden'>
+                  <TableHead columns={columns} />
 
-        {/* ------- List Table Title ---------- */}
-
-        <div className='hidden md:grid grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center py-1 px-2 border bg-gray-100 text-sm'>
-          <b>Image</b>
-          <b>Name</b>
-          <b>Category</b>
-          <b>Price</b>
-          <b className='text-center'>Action</b>
+                  <tbody className='text-sm text-gray-500'>
+                    {products.map((product) => (
+                      <TableProductRow
+                        key={product._id}
+                        product={product}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <Pagination pages={data?.data?.totalPages} />
+            </>
+          )}
         </div>
-
-        {/* ------ Product List ------ */}
-
-        {
-          list.map((item, index) => (
-            <div className='grid grid-cols-[1fr_3fr_1fr] md:grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center gap-2 py-1 px-2 border text-sm' key={index}>
-              <img className='w-12' src={item.image[0]} alt="" />
-              <p>{item.name}</p>
-              <p>{item.category}</p>
-              <p>{currency}{item.price}</p>
-              <p onClick={()=>removeProduct(item._id)} className='text-right md:text-center cursor-pointer text-lg'>X</p>
-            </div>
-          ))
-        }
-
       </div>
     </>
-  )
-}
+  );
+};
 
-export default List
+export default List;

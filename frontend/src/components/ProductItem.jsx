@@ -1,4 +1,5 @@
-import React, { useContext } from 'react'
+/* eslint-disable react/prop-types */
+import { useContext } from 'react'
 import { ShopContext } from '../context/ShopContext'
 import {Link} from 'react-router-dom'
 
@@ -13,6 +14,7 @@ const ProductItem = ({id,image,name,price}) => {
       </div>
       <p className='pt-3 pb-1 text-sm'>{name}</p>
       <p className=' text-sm font-medium'>{currency}{price}</p>
+      <button className='btn btn-primary'>Add to cart</button>
     </Link>
   )
 }

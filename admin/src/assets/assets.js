@@ -1,14 +1,21 @@
-import logo from './logo.png'
-import add_icon from './add_icon.png'
-import order_icon from './order_icon.png'
-import upload_area from './upload_area.png'
-import parcel_icon from './parcel_icon.svg'
+import addIcon from './plus.svg';
+import orderIcon from './box.svg';
+import listIcon from './list.svg';
+import deleteIcon from './delete.svg';
+import exitIcon from './exit.svg';
+import uploadArea from './upload.svg';
+import signInImage from './signin-image.webp';
+import leftArrow from './left-arrow.svg';
+import rightArrow from './right-arrow.svg';
 
 export const assets = {
-    logo,
-    add_icon,
-    order_icon,
-    upload_area,
-    parcel_icon
-}
-
+  addIcon,
+  orderIcon,
+  listIcon,
+  deleteIcon,
+  exitIcon,
+  uploadArea,
+  signInImage,
+  leftArrow,
+  rightArrow,
+};
