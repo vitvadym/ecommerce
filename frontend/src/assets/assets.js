@@ -55,5 +55,5 @@ export const WHY_CHOOSE_US = [
     title: 'Customer Support',
     description:
       'Our dedicated support team is here to assist you with any inquiries or issues you may have.',
-  }
+  },
 ];
