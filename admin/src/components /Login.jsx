@@ -11,8 +11,10 @@ const Login = () => {
   const { setAuth } = useAuthStore();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(import.meta.env.VITE_DEMO_ADMIN_EMAIL);
+  const [password, setPassword] = useState(
+    import.meta.env.VITE_DEMO_ADMIN_PASSWORD,
+  );
 
   const { mutate, isPending } = useMutation({
     mutationFn: (credentials) => authService.login(credentials),
@@ -20,21 +22,19 @@ const Login = () => {
       setAuth(data);
       toast.success('Login successful');
       navigate('/products');
-
     },
     onError: (error) => {
       toast.error(error.response?.data.message);
     },
-  })
+  });
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
-  }
+  };
 
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
-  }
-
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
